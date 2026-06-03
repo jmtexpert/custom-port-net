@@ -1,0 +1,46 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  
+}
+
+enum Role {
+  ADMIN
+  CLIENT
+}
+
+enum JobStatus {
+  PENDING
+  RECEIVED
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  password     String
+  name         String
+  role         Role     @default(CLIENT)
+  themePrimary String   @default("#3b82f6")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Job {
+  id                  Int        @id @default(autoincrement())
+  blNumber            String     @unique
+  clientName          String
+  clientEmail         String
+  dirNumber           String
+  eirNumber           String
+  returnDate          DateTime
+  advanceAmount       Decimal    @db.Decimal(12, 2)
+  totalAmount         Decimal    @db.Decimal(12, 2)
+  containerReturnDate DateTime?
+  extraFields         Json?
+  status              JobStatus  @default(PENDING)
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
+}

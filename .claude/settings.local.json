@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir D:\\\\projects\\\\custom-port /b /a)",
+      "PowerShell(head *)",
+      "PowerShell(pnpm exec *)"
+    ]
+  }
+}

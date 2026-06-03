@@ -1,0 +1,57 @@
+Act as an expert Senior Full-Stack Next.js Developer and System Architect. I will give you instructions to build a single core feature module: a Custom Clearance Management System inside my existing Next.js project. 
+
+Your objective is to generate the exact database schema, server-side cron alerts, API routes, and a dark-themed responsive UI matching my specifications.
+
+---
+
+### 1. TECH STACK & REQUIREMENTS
+- **Framework:** Next.js (App Router, Tailwind CSS).
+- **Database Layer:** Prisma ORM connecting to a MySQL Database.
+- **Mailing Engine:** Nodemailer using a Gmail SMTP Configuration.
+- **Authentication Rules:** Strict Role-Based Access Control (RBAC). Clients CANNOT self-register. A default Admin ID/Password must be seeded. New clients can only be added/registered via the Admin Panel.
+- **UI Mode:** High-end Obsidian/Black Dark Mode with an active Custom Theme Swapper. The Client can pick their custom accent color from an interactive picker; this color must save to their user profile database record and become their persistent primary theme color.
+
+---
+
+### 2. PRISMA SCHEMA & MYSQL FIELDS
+Generate a `schema.prisma` file containing:
+- **User Model:** Fields for `id`, `email`, `password`, `name`, `role` (ENUM: `ADMIN`, `CLIENT`), and `themePrimary` (String, default: `#3b82f6` to save their custom color).
+- **Job Model:** Fields to save custom clearance details:
+  - `blNumber` (String, Unique) - Bill of Lading Number
+  - `clientName` (String)
+  - `dirNumber` (String) - DIR Number
+  - `eirNumber` (String) - EIR Number
+  - `returnDate` (DateTime) - Container return deadline date
+  - `advanceAmount` (Decimal) - Advance amount paid
+  - `totalAmount` (Decimal) - Total amount
+  - `containerReturnDate` (DateTime, Nullable) - Actual container return date
+  - `extraFields` (Json, Nullable) - Flexible JSON key-value store for any additional/addon fields added later
+  - `status` (ENUM: `PENDING`, `RECEIVED` - default: `PENDING`)
+
+---
+
+### 3. THE AUTOMATED EMAIL TRACKING ENGINE (NODEMAILER)
+- Write an automated background job function (suitable for Next.js Route Handlers / internal Crons) that checks the database daily.
+- **Logic:** Find all jobs where `status == "PENDING"` AND the current date is *past* the `returnDate`.
+- **Action:** For every overdue job found, send an email to that client's email address using Nodemailer + Gmail.
+- **Frequency:** Send this email *every single day* automatically after the deadline passes, until the status is explicitly updated to `"RECEIVED"` via the panel.
+
+---
+
+### 4. VISUAL LAYOUT & PREMIUM DARK MODE
+- Create an ultra-modern, clean **Obsidian-Dark interface** layout (deep blacks/greys like `#0b0f19`, `#0d1117`, `#161b22`).
+- Include a settings widget containing an interactive color picker input.
+- When the color changes, send a `POST/PATCH` request to save that Hex code in the database under `themePrimary`.
+- Inject this color value dynamically as a CSS custom property (`--primary-accent: ${user.themePrimary}`) so that buttons, focuses, links, and accents across the admin panel adapt instantly to the client's chosen brand color.
+
+---
+
+### 5. IMPLEMENTATION CODE REQUIRED
+Generate the complete source code blocks for:
+1. `prisma/schema.prisma` definitions.
+2. A database seeding script (`prisma/seed.ts`) creating a master admin user.
+3. The server-side API route or function for the Nodemailer daily cron processor.
+4. The main Custom Clearance Job Form component (including validation fields for all custom dates and totals, plus an extra fields JSON payload wrapper).
+5. The Admin Control Panel Dashboard view displaying a tabular view of all jobs, user creation forms, and the active live-color picker theme injector.
+
+Provide cleanly organized, fully typed TypeScript code ready to pipe directly into my workspace.
