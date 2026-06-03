@@ -30,8 +30,8 @@ export async function GET(request: NextRequest) {
     )
   )
 
-  const sent = results.filter((r) => r.status === 'fulfilled').length
-  const failed = results.filter((r) => r.status === 'rejected').length
+  const sent = results.filter((r:any) => r.status === 'fulfilled').length
+  const failed = results.filter((r:any) => r.status === 'rejected').length
 
   return Response.json({
     processed: overdueJobs.length,
