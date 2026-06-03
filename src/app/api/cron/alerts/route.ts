@@ -1,11 +1,12 @@
 import { NextRequest } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { sendOverdueAlert } from '@/lib/mailer'
-
+import { Job } from '@prisma/client' // Pehle top par import karein
 export async function GET(request: NextRequest) {
   const authHeader = request.headers.get('authorization')
   const cronSecret = process.env.CRON_SECRET
-
+  console.log(authHeader);
+  
   if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 })
   }
@@ -20,7 +21,7 @@ export async function GET(request: NextRequest) {
   })
 
   const results = await Promise.allSettled(
-    overdueJobs.map((job) =>
+    overdueJobs.map((job:Job) =>
       sendOverdueAlert({
         to: job.clientEmail,
         clientName: job.clientName,
