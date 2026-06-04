@@ -72,7 +72,7 @@ export default function LoginPage() {
                   borderColor: 'var(--border)',
                   color: 'var(--text-primary)',
                 }}
-                placeholder="admin@customport.com"
+                placeholder="your@email.com"
               />
             </div>
 

@@ -3,7 +3,9 @@
     "allow": [
       "Bash(dir D:\\\\projects\\\\custom-port /b /a)",
       "PowerShell(head *)",
-      "PowerShell(pnpm exec *)"
+      "PowerShell(pnpm exec *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)"
     ]
   }
 }
