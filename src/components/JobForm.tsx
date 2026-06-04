@@ -20,9 +20,10 @@ type Props = {
     extraFields?: Record<string, unknown> | null
     status: 'PENDING' | 'RECEIVED'
   }
+  organizations?: { id: number; name: string }[]
 }
 
-export default function JobForm({ initialData }: Props) {
+export default function JobForm({ initialData, organizations }: Props) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
@@ -58,7 +59,7 @@ export default function JobForm({ initialData }: Props) {
       return acc
     }, {})
 
-    const body = {
+    const body: Record<string, unknown> = {
       blNumber: form.get('blNumber') as string,
       clientName: form.get('clientName') as string,
       clientEmail: form.get('clientEmail') as string,
@@ -71,6 +72,11 @@ export default function JobForm({ initialData }: Props) {
         ? new Date(form.get('containerReturnDate') as string).toISOString()
         : null,
       extraFields: Object.keys(extraFieldsObj).length ? extraFieldsObj : null,
+    }
+
+    if (!initialData && organizations) {
+      const orgId = form.get('organizationId')
+      body.organizationId = orgId ? parseInt(orgId as string, 10) : null
     }
 
     startTransition(async () => {
@@ -109,6 +115,21 @@ export default function JobForm({ initialData }: Props) {
 
   return (
     <form onSubmit={handleSubmit} className="max-w-2xl h-full space-y-6">
+      {!initialData && organizations && (
+        <div
+          className="rounded-xl border p-6"
+          style={{ background: 'var(--surface-2)', borderColor: 'var(--border)' }}
+        >
+          <label className="block text-xs font-medium mb-1.5" style={labelStyle}>Organization *</label>
+          <select name="organizationId" required className={inputClass} style={inputStyle}>
+            <option value="">Select organization…</option>
+            {organizations.map((org) => (
+              <option key={org.id} value={org.id}>{org.name}</option>
+            ))}
+          </select>
+        </div>
+      )}
+
       <div
         className="rounded-xl border p-6 space-y-5"
         style={{ background: 'var(--surface-2)', borderColor: 'var(--border)' }}

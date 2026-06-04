@@ -27,6 +27,7 @@ export async function POST(request: NextRequest) {
       role: user.role,
       name: user.name,
       themePrimary: user.themePrimary,
+      organizationId: user.organizationId,
     })
 
     return Response.json({

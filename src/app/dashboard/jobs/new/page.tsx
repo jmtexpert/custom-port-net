@@ -1,10 +1,16 @@
+import { prisma } from '@/lib/prisma'
 import { getSession } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import JobForm from '@/components/JobForm'
 
 export default async function NewJobPage() {
   const session = await getSession()
-  if (session?.role !== 'ADMIN') redirect('/dashboard/jobs')
+  if (!session) redirect('/login')
+
+  const organizations =
+    session.role === 'ADMIN'
+      ? await prisma.organization.findMany({ select: { id: true, name: true }, orderBy: { name: 'asc' } })
+      : undefined
 
   return (
     <div className="p-6 h-full overflow-y-auto">
@@ -16,7 +22,7 @@ export default async function NewJobPage() {
           Create a new custom clearance job entry
         </p>
       </div>
-      <JobForm />
+      <JobForm organizations={organizations} />
     </div>
   )
 }

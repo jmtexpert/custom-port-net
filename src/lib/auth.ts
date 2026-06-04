@@ -11,6 +11,7 @@ export type SessionPayload = {
   role: 'ADMIN' | 'CLIENT'
   name: string
   themePrimary: string
+  organizationId: number | null
 }
 
 export async function createSession(payload: SessionPayload) {

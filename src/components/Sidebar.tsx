@@ -12,8 +12,9 @@ type Props = {
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: '⬛', roles: ['ADMIN', 'CLIENT'] },
   { href: '/dashboard/jobs', label: 'Jobs', icon: '📦', roles: ['ADMIN', 'CLIENT'] },
-  { href: '/dashboard/jobs/new', label: 'New Job', icon: '➕', roles: ['ADMIN'] },
-  { href: '/dashboard/users', label: 'Users', icon: '👥', roles: ['ADMIN'] },
+  { href: '/dashboard/jobs/new', label: 'New Job', icon: '➕', roles: ['ADMIN', 'CLIENT'] },
+  { href: '/dashboard/organizations', label: 'Organizations', icon: '🏢', roles: ['ADMIN'] },
+  { href: '/dashboard/users', label: 'Users', icon: '👥', roles: ['ADMIN', 'CLIENT'] },
   { href: '/dashboard/settings', label: 'Settings', icon: '⚙️', roles: ['ADMIN', 'CLIENT'] },
 ]
 

@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma'
 import { getSession } from '@/lib/auth'
 
 const createJobSchema = z.object({
+  organizationId: z.number().int().positive().optional().nullable(),
   blNumber: z.string().min(1),
   clientName: z.string().min(1),
   clientEmail: z.string().email(),
@@ -21,7 +22,13 @@ export async function GET() {
   const session = await getSession()
   if (!session) return Response.json({ error: 'Unauthorized' }, { status: 401 })
 
+  const where =
+    session.role === 'ADMIN'
+      ? {}
+      : { organizationId: session.organizationId ?? -1 }
+
   const jobs = await prisma.job.findMany({
+    where,
     orderBy: { createdAt: 'desc' },
   })
 
@@ -31,7 +38,6 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   const session = await getSession()
   if (!session) return Response.json({ error: 'Unauthorized' }, { status: 401 })
-  if (session.role !== 'ADMIN') return Response.json({ error: 'Forbidden' }, { status: 403 })
 
   const body = await request.json()
   const parsed = createJobSchema.safeParse(body)
@@ -41,10 +47,13 @@ export async function POST(request: NextRequest) {
   }
 
   const data = parsed.data
+  const organizationId =
+    session.role === 'ADMIN' ? (data.organizationId ?? null) : session.organizationId
 
   try {
     const job = await prisma.job.create({
       data: {
+        organizationId,
         blNumber: data.blNumber,
         clientName: data.clientName,
         clientEmail: data.clientEmail,

@@ -5,7 +5,7 @@ import JobForm from '@/components/JobForm'
 
 export default async function EditJobPage(props: { params: Promise<{ id: string }> }) {
   const session = await getSession()
-  if (session?.role !== 'ADMIN') redirect('/dashboard/jobs')
+  if (!session) redirect('/login')
 
   const { id } = await props.params
   const jobId = parseInt(id, 10)

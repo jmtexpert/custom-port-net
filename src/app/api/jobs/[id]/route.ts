@@ -18,14 +18,22 @@ const updateJobSchema = z.object({
   extraFields: z.record(z.string(), z.unknown()).optional().nullable(),
 })
 
+async function resolveJobAccess(jobId: number, session: { role: string; organizationId: number | null }) {
+  if (session.role === 'ADMIN') return true
+  const job = await prisma.job.findUnique({ where: { id: jobId }, select: { organizationId: true } })
+  return job?.organizationId !== null && job?.organizationId === session.organizationId
+}
+
 export async function PATCH(request: NextRequest, ctx: RouteContext<'/api/jobs/[id]'>) {
   const session = await getSession()
   if (!session) return Response.json({ error: 'Unauthorized' }, { status: 401 })
-  if (session.role !== 'ADMIN') return Response.json({ error: 'Forbidden' }, { status: 403 })
 
   const { id } = await ctx.params
   const jobId = parseInt(id, 10)
   if (isNaN(jobId)) return Response.json({ error: 'Invalid ID' }, { status: 400 })
+
+  const allowed = await resolveJobAccess(jobId, session)
+  if (!allowed) return Response.json({ error: 'Forbidden' }, { status: 403 })
 
   const body = await request.json()
   const parsed = updateJobSchema.safeParse(body)
@@ -67,11 +75,13 @@ export async function PATCH(request: NextRequest, ctx: RouteContext<'/api/jobs/[
 export async function DELETE(_req: NextRequest, ctx: RouteContext<'/api/jobs/[id]'>) {
   const session = await getSession()
   if (!session) return Response.json({ error: 'Unauthorized' }, { status: 401 })
-  if (session.role !== 'ADMIN') return Response.json({ error: 'Forbidden' }, { status: 403 })
 
   const { id } = await ctx.params
   const jobId = parseInt(id, 10)
   if (isNaN(jobId)) return Response.json({ error: 'Invalid ID' }, { status: 400 })
+
+  const allowed = await resolveJobAccess(jobId, session)
+  if (!allowed) return Response.json({ error: 'Forbidden' }, { status: 403 })
 
   await prisma.job.delete({ where: { id: jobId } })
   return Response.json({ success: true })

@@ -4,7 +4,6 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  
 }
 
 enum Role {
@@ -17,30 +16,42 @@ enum JobStatus {
   RECEIVED
 }
 
+model Organization {
+  id        Int      @id @default(autoincrement())
+  name      String
+  createdAt DateTime @default(now())
+  users     User[]
+  jobs      Job[]
+}
+
 model User {
-  id           Int      @id @default(autoincrement())
-  email        String   @unique
-  password     String
-  name         String
-  role         Role     @default(CLIENT)
-  themePrimary String   @default("#3b82f6")
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id             Int           @id @default(autoincrement())
+  email          String        @unique
+  password       String
+  name           String
+  role           Role          @default(CLIENT)
+  organizationId Int?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  themePrimary   String        @default("#3b82f6")
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
 }
 
 model Job {
-  id                  Int        @id @default(autoincrement())
-  blNumber            String     @unique
+  id                  Int           @id @default(autoincrement())
+  organizationId      Int?
+  organization        Organization? @relation(fields: [organizationId], references: [id])
+  blNumber            String        @unique
   clientName          String
   clientEmail         String
   dirNumber           String
   eirNumber           String
   returnDate          DateTime
-  advanceAmount       Decimal    @db.Decimal(12, 2)
-  totalAmount         Decimal    @db.Decimal(12, 2)
+  advanceAmount       Decimal       @db.Decimal(12, 2)
+  totalAmount         Decimal       @db.Decimal(12, 2)
   containerReturnDate DateTime?
   extraFields         Json?
-  status              JobStatus  @default(PENDING)
-  createdAt           DateTime   @default(now())
-  updatedAt           DateTime   @updatedAt
+  status              JobStatus     @default(PENDING)
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
 }
